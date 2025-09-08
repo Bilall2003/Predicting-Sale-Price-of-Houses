@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import ElasticNet,LinearRegression
 from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split,GridSearchCV,cross_validate
 from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score
 from sklearn.pipeline import Pipeline
@@ -107,7 +108,7 @@ class EDA:
                 st.title("Outliers")
 
                 numeric_cols = self.df.select_dtypes(include=['number']).columns
-                col_selected = st.selectbox("Choose a column to view boxplot", numeric_cols)
+                col_selected = st.selectbox("Choose a column to view boxplot(Outliers)", numeric_cols)
                 st.warning("**Dropping Outliers may cause difficulty for the model because some outliers represent real houses (mansions, luxury homes)**..... ")
 
                 fig, ax = plt.subplots(figsize=(10,6))
@@ -116,7 +117,7 @@ class EDA:
                 st.pyplot(fig)
                 
                 if st.button("Keep as-is"):
-                  st.info("Data is in Original Form....")
+                  st.info("No Outliers Removed....")
                
      
                 
@@ -223,7 +224,7 @@ class ML(EDA):
                     "Linear Regression":LinearRegression(),
                     "ElasticNet": ElasticNet(),
                     "SVR":SVR(),
-                    "select":None
+                    "RandomForest":RandomForestRegressor()
                 }
                 
                 
@@ -282,7 +283,7 @@ class ML(EDA):
                             "model__l1_ratio": [0.1, 0.5, 0.7, 0.9, 0.95, 0.99, 1]
                             }
                         
-                        grid_model1=GridSearchCV(estimator=operation1,param_grid=para1,cv=5)
+                        grid_model1=GridSearchCV(estimator=operation1,param_grid=para1,cv=5,n_jobs=-1)
                         
                         grid_model1.fit(self.X_train, self.y_train)
                         self.value_select=grid_model1.best_estimator_
@@ -309,7 +310,7 @@ class ML(EDA):
                             "model__gamma": ["scale", "auto"]    
                         }
 
-                        grid_model2=GridSearchCV(estimator=operation1,param_grid=para2,cv=5)
+                        grid_model2=GridSearchCV(estimator=operation1,param_grid=para2,cv=5,n_jobs=-1)
                         grid_model2.fit(self.X_train,self.y_train)
                         self.value_select=grid_model2.best_estimator_
                         pred=self.value_select.predict(self.X_test)
@@ -327,6 +328,32 @@ class ML(EDA):
                         st.dataframe(svr.style.background_gradient(cmap="Blues"))
                         
                         st.warning("Validation result of SVR is on  default  parameters. This Result depend on tuned performance")
+                        
+                    elif self.key_select=="RandomForest":
+               
+                        para3={"model__n_estimators":[20,40,60,100,120,140],
+                                 "model__max_features": ["sqrt", "log2"],
+                                "model__bootstrap":[True,False],
+                                "model__oob_score":[True,False]               
+                                }
+
+                        grid_model3=GridSearchCV(estimator=operation1,param_grid=para3,cv=5,n_jobs=-1)
+                        grid_model3.fit(self.X_train,self.y_train)
+                        self.value_select=grid_model3.best_estimator_
+                        pred=self.value_select.predict(self.X_test)
+                        
+                        st.subheader("Random Forest Test Performance")
+                        st.text(f"Best parameters : {grid_model3.best_params_}")
+                        
+                        rf_eval =[{
+                        "MAE": mean_absolute_error(self.y_test, pred),
+                        "RMSE": np.sqrt(mean_squared_error(self.y_test, pred)),
+                        "R²": r2_score(self.y_test, pred)
+                    }]
+                        rf = pd.DataFrame(rf_eval).T
+                        rf.columns = ["Test Result"]
+                        st.dataframe(rf.style.background_gradient(cmap="Blues"))
+                        
                         
                         return self.key_select
             
@@ -355,18 +382,20 @@ class deployment(ML):
                 if "deployed" in st.session_state and st.session_state["deployed"]:
                     st.info("✅ Model is already deployed!")
                 else:
-                    with st.spinner("Checking Model..."):
+                    with st.spinner("Deploying your model... Please wait"):
+                        st.write(" Checking Model...")
                         time.sleep(1)
-                    with st.spinner("Collecting Information..."):
+                        st.write(" Collecting Information...")
                         time.sleep(1)
-                    with st.spinner("Deploying..."):
+                        st.write(" Storing Information...")
+                        time.sleep(1)
+                        st.write(" Deploying...")
                         time.sleep(1)
 
                     dump(st.session_state["chosen_model_obj"], "deploy_Model.joblib")
-                    
+
                     st.session_state["deployed"] = True  
                     st.success("🚀 Model Deployed Successfully!")
-   
 class stream(deployment):
     
     def run_load(self):
@@ -398,11 +427,11 @@ class stream(deployment):
     def app(self):
         
         st.sidebar.title("Data Set Link")
+        st.sidebar.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt2_J70Yg6FjTYS29h1wFk9gMJP6M79JBDSA&s",width=50)
         st.sidebar.link_button("click Here","https://github.com/HomeLander2003/Predicting-Sale-Price-of-Houses/blob/main/DATA/AMES_Final_DF.csv")
         
-        
-        st.sidebar.title("Choose Options")
-        
+        # st.sidebar.title("Choose Options")
+ 
         options={
             "Preprocessing":self.run_clean,
             "Analysis":self.run_analysis,
