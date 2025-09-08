@@ -26,7 +26,7 @@ It integrates **Exploratory Data Analysis (EDA)**, preprocessing, insights visua
   - Linear Regression  
   - ElasticNet (with GridSearchCV for tuning)  
   - Support Vector Regressor (SVR with GridSearchCV)
-  - Random Forest Regressor(RF with Regressor) 
+  - Random Forest Regressor(RF with GridSearchCV) 
   - Cross-validation with MAE, RMSE, and R² metrics  
 
 - **Model Deployment**
