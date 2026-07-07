@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>House Price Prediction - README</title>
 </head>
 
 <body style="font-family: Arial, Helvetica, sans-serif; background:#f5f7fa; color:#333; line-height:1.7; margin:40px;">
