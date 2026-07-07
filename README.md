@@ -35,7 +35,7 @@ including <strong>Exploratory Data Analysis (EDA)</strong>,
 <h2>🚀 Features</h2>
 
 <ul>
-<li><strong>📂 Data Loading & Cleaning</strong>
+<li><strong> Data Loading & Cleaning</strong>
     <ul>
         <li>Load Ames Housing Dataset</li>
         <li>Handle Missing Values</li>
@@ -68,7 +68,7 @@ including <strong>Exploratory Data Analysis (EDA)</strong>,
 
 <br>
 
-<li><strong>🤖 Machine Learning Models</strong>
+<li><strong>🧠 Machine Learning Models</strong>
     <ul>
         <li>Linear Regression</li>
         <li>ElasticNet (GridSearchCV)</li>
